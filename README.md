@@ -1,6 +1,6 @@
 # peliculas
 
-A new Flutter project.
+Proyecto en flutter sobre peliculas
 
 ## Getting Started
 
