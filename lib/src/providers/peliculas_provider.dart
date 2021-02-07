@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:peliculas/src/models/actores_model.dart';
+import 'package:peliculas/src/models/images_model.dart';
 import 'package:peliculas/src/models/pelicula_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:peliculas/src/models/peopleImage_model.dart';
+import 'package:peliculas/src/models/people_model.dart';
 
 class PeliculasProvider{
   String _apiKey="3e2dd5809035a20cf8660785fe07d254";
@@ -25,11 +28,19 @@ class PeliculasProvider{
   }
 
   Future<List<Pelicula>> _procesarRespuesta(Uri uri) async{
-    final respuesta= await http.get(uri);
-    final decodedData= json.decode(respuesta.body);
+    Peliculas peliculas= Peliculas();
+    try{
+      final respuesta= await http.get(uri);
+      final decodedData= json.decode(respuesta.body);
 
-    final peliculas= Peliculas.fromJsonList(decodedData["results"]);
+      peliculas= Peliculas.fromJsonList(decodedData["results"]);
+      
+    }catch(err){
+      print('Error');
+      print(err.toString());
+    }
     return peliculas.items;
+    
   }
 
   Future<List<Pelicula>> getEnCines() async{
@@ -78,6 +89,48 @@ class PeliculasProvider{
       'query' : query
     });
     return await _procesarRespuesta(url);
+  }
+
+  Future<People> getPeople(int peopleId) async{
+    final url=Uri.https(_url, "3/person/$peopleId",{
+      'api_key': _apiKey,
+      'language':_language,
+    });
+    final resp= await http.get(url);
+    final decodeData=json.decode(resp.body);
+    
+    final People people= People.fromJson(decodeData);
+    return people;
+  }
+
+  Future<ImagesModel> getImagesPeople(int peopleId) async{
+    final url=Uri.https(_url, "3/person/$peopleId/images",{
+      'api_key': _apiKey,
+      'language':_language,
+    });
+    final resp= await http.get(url);
+    final decodeData=json.decode(resp.body);
+    final ImagesModel images=ImagesModel.fromJson(decodeData);
+    return images;
+  }
+
+  Future<PeopleImage> getPeopleImage(int peopleId) async{
+    final url=Uri.https(_url, "3/person/$peopleId",{
+      'api_key': _apiKey,
+      'language':_language,
+    });
+    final resp= await http.get(url);
+    final decodeData=json.decode(resp.body);
+    final People people= People.fromJson(decodeData);
+
+    final url2=Uri.https(_url, "3/person/$peopleId/images",{
+      'api_key': _apiKey,
+      'language':_language,
+    });
+    final resp2= await http.get(url2);
+    final decodeData2=json.decode(resp2.body);
+    final ImagesModel images=ImagesModel.fromJson(decodeData2);
+    return PeopleImage(people: people,imagesModel: images);
   }
 
 

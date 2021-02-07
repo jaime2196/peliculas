@@ -70,6 +70,7 @@ class DataSearch extends SearchDelegate{
                   image: NetworkImage(pelicula.getPosterBackgroundImg()),
                   width: 50.0,
                   fit: BoxFit.contain,
+                  placeholderErrorBuilder: (contex,url,error)=> Text("Error"),
                   ),
                 title: Text(pelicula.title),
                 subtitle: Text(pelicula.originalTitle),

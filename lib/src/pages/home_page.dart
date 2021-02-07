@@ -34,6 +34,7 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
+      drawer: _drawer(),
     );
   }
 
@@ -64,9 +65,11 @@ Widget _swiperTarjetas() {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Container(
-            padding: EdgeInsets.only(left: 20.0),
-            child: Text("Populares", style: Theme.of(context).textTheme.subhead,)),
+          Center(
+            child: Container(
+              padding: EdgeInsets.only(left: 20.0),
+              child: Text("Populares", style: Theme.of(context).textTheme.subhead,)),
+          ),
           SizedBox(height: 5.0,),
           StreamBuilder(
             stream: peliculasProvider.popularesStream,
@@ -81,6 +84,36 @@ Widget _swiperTarjetas() {
             }
             ),
         ],
+      ),
+    );
+  }
+
+  Widget _drawer(){
+    return Drawer(
+      child: SafeArea(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+             InkWell(
+                onTap: () => debugPrint("home Page"),
+                child: ListTile(
+                  title: Text("Actores"),
+                  leading: Icon(Icons.home),
+                ),
+              ),
+            ListTile(
+              title: Text('Item 1'),
+              onTap: null
+            ),
+            ListTile(
+              title: Text('Item 2'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

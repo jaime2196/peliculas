@@ -22,10 +22,6 @@ class PeliculaDetalle extends StatelessWidget {
               SizedBox(height: 10.0,),
               _posterTitulo(pelicula,context),
               _descripcion(pelicula),
-              _descripcion(pelicula),
-              _descripcion(pelicula),
-              _descripcion(pelicula),
-              _descripcion(pelicula),
               _crearCasting(pelicula),
             ]),
           )
@@ -58,46 +54,64 @@ class PeliculaDetalle extends StatelessWidget {
   }
 
   Widget _posterTitulo(Pelicula pelicula, BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 20.0),
-      child: Row(
-        children: <Widget>[
-          Hero(
-            tag: pelicula.uniqueID,
-            child: ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-            child: Image(
-                image: NetworkImage(pelicula.getPosterImg()),
-                height: 150.0,
-              )
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10),
+        child: Row(
+          children: <Widget>[
+            Hero(
+              tag: pelicula.uniqueID,
+              child: ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+              child: Image(
+                  image: NetworkImage(pelicula.getPosterImg()),
+                  height: 150.0,
+                )
+              ),
             ),
-          ),
-          SizedBox(width: 20.0,),
-          Flexible(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(pelicula.title, style: Theme.of(context).textTheme.title, overflow: TextOverflow.ellipsis),
-                Text(pelicula.originalTitle, style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis),
-                Row(
-                  children: <Widget>[
-                    Icon(Icons.star_border),
-                    Text(pelicula.voteAverage.toString(),style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis)
-                  ],
-                ),
-              ],
-            )),
-        ],
+            SizedBox(width: 20.0,),
+            Flexible(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(pelicula.title, style: Theme.of(context).textTheme.title, overflow: TextOverflow.ellipsis),
+                  Text(pelicula.originalTitle, style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis),
+                  Row(children: [
+                    Icon(Icons.date_range),
+                    Text(pelicula.releaseDate.toString(),style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis)
+                  ]),
+                  Row(
+                    children: <Widget>[
+                      Icon(Icons.star_border),
+                      Text(pelicula.voteAverage.toString(),style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis)
+                    ],
+                  ),
+                  Row(children: [
+                    Icon(Icons.supervisor_account_outlined ),
+                    pelicula.adult?Text('+18',style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis):Text('+0',style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis),
+                  ]),
+                ],
+              )),
+          ],
+        ),
       ),
     );
   }
 
   Widget _descripcion(Pelicula pelicula) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-      child: Text(
-        pelicula.overview,
-        textAlign: TextAlign.justify,
+    return Card(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      margin: EdgeInsets.all(15),
+      elevation: 10,
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+        child: Text(
+          pelicula.overview,
+          textAlign: TextAlign.justify,
+        ),
       ),
     );
   }
@@ -127,30 +141,36 @@ class PeliculaDetalle extends StatelessWidget {
           initialPage: 1
         ),
         itemCount: actores.length,
-        itemBuilder: (contex, i)=>_actorTargeta(actores[i]),
+        itemBuilder: (contex, i)=>_actorTargeta(actores[i],contex),
       ),
       );
   }
 
-  Widget _actorTargeta(Actor actor){
-    return Container(
-      child: Column(
-        children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20.0),
-              child: FadeInImage(
-              placeholder: AssetImage("assets/img/no-image.jpg"),
-              image: NetworkImage(actor.getFoto()),
-              height: 150.0,
-              fit: BoxFit.cover,
+  Widget _actorTargeta(Actor actor,BuildContext context){
+    print(actor.id);
+    return GestureDetector(
+      child: Container(
+        child: Column(
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20.0),
+                child: FadeInImage(
+                  placeholder: AssetImage("assets/img/no-image.jpg"),
+                  image: NetworkImage(actor.getFoto()),
+                  height: 150.0,
+                  fit: BoxFit.cover,
+              ),
             ),
-          ),
-          Text(
-            actor.name,
-            overflow: TextOverflow.ellipsis,
-            )
-        ],
+            Text(
+              actor.name,
+              overflow: TextOverflow.ellipsis,
+              )
+          ],
+        ),
       ),
+      onTap: (){
+        Navigator.pushNamed(context, 'people',arguments: actor.id);
+      },
     );
   }
 }
