@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("Peliculas en cines"),
-        backgroundColor: Colors.indigoAccent,
+        backgroundColor: Color(0xFF4E8CBF),
         actions: <Widget>[
           IconButton(icon: Icon(Icons.search), onPressed: (){
             showSearch(context: context, delegate: DataSearch());

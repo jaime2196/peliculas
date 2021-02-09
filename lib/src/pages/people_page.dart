@@ -46,7 +46,7 @@ class PeoplePage extends StatelessWidget {
         SliverList(delegate: SliverChildListDelegate([
           SizedBox(height: 10.0),
           _datosBasicos(peopleImage,context),
-          _descripcion(peopleImage),
+          peopleImage.people.biography==''?Container(): _descripcion(peopleImage),
           _fotos(peopleImage),
         ])),
       ],
