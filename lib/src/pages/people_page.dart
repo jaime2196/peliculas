@@ -3,6 +3,9 @@ import 'package:peliculas/src/models/images_model.dart';
 import 'package:peliculas/src/models/peopleImage_model.dart';
 import 'package:peliculas/src/models/people_model.dart';
 import 'package:peliculas/src/providers/peliculas_provider.dart';
+import 'package:peliculas/src/widgets/header_painter.dart';
+import 'package:intl/intl.dart';
+
 
 class PeoplePage extends StatelessWidget {
   const PeoplePage({Key key}) : super(key: key);
@@ -13,22 +16,25 @@ class PeoplePage extends StatelessWidget {
     final peliculasProvider= PeliculasProvider();
 
     return Scaffold(
-      body:  FutureBuilder(
-        future: peliculasProvider.getPeopleImage(peopleId),
-        builder: (BuildContext context, AsyncSnapshot<PeopleImage> snapshot) {
-          if(snapshot.hasData){
-            PeopleImage peopleImage=snapshot.data;
-            //return Text(peopleImage.people.name);
-            return _crearScrollView(peopleImage,context);
-          }else{
-            return Container(
-              height: 400,
-              child: Center(
-                child: CircularProgressIndicator()
-              )
-            );
+      body:  CustomPaint(
+        painter: HeaderPaintWaves(),
+        child: FutureBuilder(
+          future: peliculasProvider.getPeopleImage(peopleId),
+          builder: (BuildContext context, AsyncSnapshot<PeopleImage> snapshot) {
+            if(snapshot.hasData){
+              PeopleImage peopleImage=snapshot.data;
+              //return Text(peopleImage.people.name);
+              return _crearScrollView(peopleImage,context);
+            }else{
+              return Container(
+                height: double.infinity,
+                child: Center(
+                  child: CircularProgressIndicator()
+                )
+              );
+            }
           }
-        }
+        ),
       ),
     );
   }
@@ -41,6 +47,7 @@ class PeoplePage extends StatelessWidget {
           SizedBox(height: 10.0),
           _datosBasicos(peopleImage,context),
           _descripcion(peopleImage),
+          _fotos(peopleImage),
         ])),
       ],
     );
@@ -74,7 +81,7 @@ class PeoplePage extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
         child: Text(
-          peopleImage.people.biography,
+          peopleImage.people.biography==''?'(No hay descripcion)':peopleImage.people.biography,
           textAlign: TextAlign.justify,
         ),
       ),
@@ -82,22 +89,96 @@ class PeoplePage extends StatelessWidget {
   }
 
   _datosBasicos(PeopleImage peopleImage, BuildContext context){
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      margin: EdgeInsets.all(15),
-      elevation: 10,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              Icon(Icons.border_bottom_rounded),
-              Text(peopleImage.people.birthday.toString(),style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
-            ],),
-          ],
+    return 
+      Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: EdgeInsets.all(15),
+        elevation: 10,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                Icon(Icons.face),
+                Text(fechaFormateada(peopleImage.people.birthday, 'Fecha de nacimiento:'),style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+              ]),
+              Row(children: [
+                Icon(Icons.person),
+                Text(calcularEdad(peopleImage.people.birthday),style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+              ]),
+              Row(
+                children: [
+                Icon(Icons.place),
+                Text('${peopleImage.people.placeOfBirth}',style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+              ]),
+              Row(children: [
+                Icon(Icons.star_border),
+                Text('Popularidad: ${peopleImage.people.popularity.truncate().toString()}',style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+              ]),
+              Row(children: [
+                Icon(Icons.people),
+                Text(calcularSexo(peopleImage.people.gender),style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+              ]),
+            ],
+          ),
         ),
-      ),
+    );
+  }
+  String fechaFormateada(DateTime date, String literal){
+    if(date==null || date==DateTime.parse("1500-02-03")){
+      return '~';
+    }
+    return '$literal ${DateFormat("dd-MM-yyyy").format(date)}';
+  }
+
+  String calcularEdad(DateTime date){
+    if(date==null || date==DateTime.parse("1500-02-03")){
+      return '~';
+    }
+    return 'Edad: ${(DateTime.now().difference(date).inDays/365).floor().toString()} años';
+  }
+
+  String calcularSexo(int gender){
+    if(gender==2){
+      return 'Sexo: masculino';
+    }else if(gender==1){
+      return 'Sexo: femenino';
+    }else{
+      return 'Sexo: ~';
+    }
+  }
+
+  Widget _foto(FadeInImage image){
+    return Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: EdgeInsets.all(15),
+        elevation: 10,
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+          child: image/*Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: getImagenes(peopleImage)
+          )*/
+        ),
+    );
+  }
+
+  Widget _fotos(PeopleImage peopleImage){
+    List<Image> lista=new List();
+    for(int i=1;i!=peopleImage.imagesModel.profiles.length;i++){
+      lista.add(Image.network(peopleImage.imagesModel.getURLImagen(i)));
+    }
+    List<Widget> listaWidget=new List();
+    for(int a=0;a!=lista.length;a++){
+      FadeInImage fadeInImage=FadeInImage.assetNetwork(
+        image: peopleImage.imagesModel.getURLImagen(a),
+        placeholder: "assets/img/loading.gif",
+      );
+      listaWidget.add(_foto(fadeInImage));
+    }
+    return Column(
+      children: listaWidget,
     );
   }
 }

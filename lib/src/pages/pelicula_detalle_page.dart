@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:peliculas/src/models/actores_model.dart';
 import 'package:peliculas/src/models/pelicula_model.dart';
 import 'package:peliculas/src/providers/peliculas_provider.dart';
+import 'package:peliculas/src/widgets/header_painter.dart';
 
 class PeliculaDetalle extends StatelessWidget {
   
@@ -14,18 +15,21 @@ class PeliculaDetalle extends StatelessWidget {
     final Pelicula pelicula=ModalRoute.of(context).settings.arguments;
 
     return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          _crearAppbar(pelicula),
-          SliverList(
-            delegate: SliverChildListDelegate([
-              SizedBox(height: 10.0,),
-              _posterTitulo(pelicula,context),
-              _descripcion(pelicula),
-              _crearCasting(pelicula),
-            ]),
-          )
-        ],
+      body: CustomPaint(
+        painter: HeaderPaintWaves(),
+        child: CustomScrollView(
+          slivers: <Widget>[
+            _crearAppbar(pelicula),
+            SliverList(
+              delegate: SliverChildListDelegate([
+                SizedBox(height: 10.0,),
+                _posterTitulo(pelicula,context),
+                _descripcion(pelicula),
+                _crearCasting(pelicula),
+              ]),
+            )
+          ],
+        ),
       ),
 
     );
