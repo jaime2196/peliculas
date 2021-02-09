@@ -89,6 +89,10 @@ class PeoplePage extends StatelessWidget {
   }
 
   _datosBasicos(PeopleImage peopleImage, BuildContext context){
+    String fechaNacimiento=fechaFormateada(peopleImage.people.birthday, 'Fecha de nacimiento:');
+    String edad=calcularEdad(peopleImage.people.birthday);
+    String lugarNacimiento= peopleImage.people.placeOfBirth==null?'~' :'${peopleImage.people.placeOfBirth}';
+    String sexo=calcularSexo(peopleImage.people.gender);
     return 
       Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -99,18 +103,23 @@ class PeoplePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(children: [
+              rowDatoBasico(Icons.face,fechaNacimiento,context),
+              rowDatoBasico(Icons.person,edad,context),
+              rowDatoBasico(Icons.place,lugarNacimiento,context),
+              rowDatoBasico(Icons.star_border,'Popularidad: ${peopleImage.people.popularity.truncate().toString()}',context),
+              rowDatoBasico(Icons.people,sexo,context),
+              /*Row(children: [
                 Icon(Icons.face),
-                Text(fechaFormateada(peopleImage.people.birthday, 'Fecha de nacimiento:'),style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+                Text(fechaNacimiento,style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
               ]),
               Row(children: [
                 Icon(Icons.person),
-                Text(calcularEdad(peopleImage.people.birthday),style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+                Text(edad,style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
               ]),
               Row(
                 children: [
                 Icon(Icons.place),
-                Text('${peopleImage.people.placeOfBirth}',style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+                Text(lugarNacimiento,style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
               ]),
               Row(children: [
                 Icon(Icons.star_border),
@@ -118,12 +127,24 @@ class PeoplePage extends StatelessWidget {
               ]),
               Row(children: [
                 Icon(Icons.people),
-                Text(calcularSexo(peopleImage.people.gender),style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
-              ]),
+                Text(sexo,style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+              ]),*/
             ],
           ),
         ),
     );
+  }
+
+  Widget rowDatoBasico(IconData icon, String texto, BuildContext context){
+    if(texto==null || texto=='~'){
+      return Container();
+    }
+
+    return Row(children: [
+                Icon(icon),
+                SizedBox(width: 8),
+                Text(texto,style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
+            ]);
   }
   String fechaFormateada(DateTime date, String literal){
     if(date==null || date==DateTime.parse("1500-02-03")){

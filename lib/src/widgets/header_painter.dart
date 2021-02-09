@@ -27,10 +27,10 @@ class HeaderPaintWaves extends CustomPainter {
     final path2 = Path();
     path2.moveTo(0, size.height);
     path2.lineTo(0, size.height * 0.60);
-    path2.quadraticBezierTo(size.width * 0.25, size.height * 0.44,
+    path2.quadraticBezierTo(size.width * 0.25, size.height * 0.55,
       size.width * 0.5, size.height * 0.60);
     path2.quadraticBezierTo(size.width * 0.75,size.height * 0.70,                                 
-      size.width, size.height *0.50);  
+      size.width, size.height *0.60);  
     path2.lineTo(size.width, size.height);
     canvas.drawPath(path2, paint2);
   }
