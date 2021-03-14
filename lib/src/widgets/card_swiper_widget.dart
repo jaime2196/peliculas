@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:peliculas/src/models/pelicula_model.dart';
+import 'package:provider/provider.dart';
+
+import 'GradientHelper.dart';
 
 class CardSwiper extends StatelessWidget {
   final List<Pelicula> peliculas;
@@ -12,7 +15,9 @@ class CardSwiper extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final _screenSize= MediaQuery.of(context).size;
-
+    final gradientHelper= Provider.of<GradientHelper>(context);
+    
+    //gradientHelper.generarColor(peliculas[0].getPosterImg());
     return Container(
     padding: EdgeInsets.only(top: 10.0, ),
     //width: _screenSize.width *0.7,
@@ -20,6 +25,7 @@ class CardSwiper extends StatelessWidget {
     child: Swiper(
       itemBuilder: (BuildContext context,int index){
         peliculas[index].uniqueID="${peliculas[index].id}-tarjeta";
+        //gradientHelper.generarColor(peliculas[0].getPosterImg());
         return Hero(
           tag: peliculas[index].uniqueID,
             child: ClipRRect(
@@ -36,6 +42,10 @@ class CardSwiper extends StatelessWidget {
       itemCount: peliculas.length,
       //pagination:  SwiperPagination(),
       control:  SwiperControl(size: 0),
+      onIndexChanged: (indexChange){
+        gradientHelper.generarColor(peliculas[indexChange].getPosterImg());
+      },
+      
     ),
   );
   }

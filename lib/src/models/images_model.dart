@@ -28,11 +28,16 @@ class ImagesModel {
     };
 
     getURLImagen(int index){
-      if(this.profiles[index]!=null){
-        return "https://image.tmdb.org/t/p/w500${this.profiles[index].filePath}";
+      if(this.profiles.length>1){
+        if(this.profiles[index]!=null){
+          return "https://image.tmdb.org/t/p/w500${this.profiles[index].filePath}";
+        }else{
+          return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1200px-Imagen_no_disponible.svg.png";
+        }
       }else{
         return "https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Imagen_no_disponible.svg/1200px-Imagen_no_disponible.svg.png";
       }
+      
     }
 
 }

@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:peliculas/src/models/actores_model.dart';
 import 'package:peliculas/src/models/pelicula_model.dart';
 import 'package:peliculas/src/providers/peliculas_provider.dart';
-import 'package:peliculas/src/widgets/header_painter.dart';
+import 'package:peliculas/src/widgets/GradientHelper.dart';
+import 'package:provider/provider.dart';
+
 
 class PeliculaDetalle extends StatelessWidget {
   
@@ -13,24 +15,28 @@ class PeliculaDetalle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Pelicula pelicula=ModalRoute.of(context).settings.arguments;
-
+    final gradientHelper= Provider.of<GradientHelper>(context);
+    
     return Scaffold(
-      body: CustomPaint(
-        painter: HeaderPaintWaves(),
-        child: CustomScrollView(
-          slivers: <Widget>[
-            _crearAppbar(pelicula),
-            SliverList(
-              delegate: SliverChildListDelegate([
-                SizedBox(height: 10.0,),
-                _posterTitulo(pelicula,context),
-                _descripcion(pelicula),
-                _crearCasting(pelicula),
-              ]),
-            )
-          ],
+      body:Container(
+        decoration: BoxDecoration(
+          gradient: gradientHelper.gradient,
         ),
+        child: CustomScrollView(
+            slivers: <Widget>[
+              _crearAppbar(pelicula),
+              SliverList(
+                delegate: SliverChildListDelegate([
+                  SizedBox(height: 10.0,),
+                  _posterTitulo(pelicula,context),
+                  _descripcion(pelicula),
+                  _crearCasting(pelicula),
+                ]),
+              )
+            ],
+          ),
       ),
+      
 
     );
   }
@@ -81,21 +87,21 @@ class PeliculaDetalle extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(pelicula.title, style: Theme.of(context).textTheme.title, overflow: TextOverflow.ellipsis),
-                  Text(pelicula.originalTitle, style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis),
+                  Text(pelicula.title, style: Theme.of(context).textTheme.headline6, overflow: TextOverflow.ellipsis),
+                  Text(pelicula.originalTitle, style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
                   Row(children: [
                     Icon(Icons.date_range),
-                    Text(pelicula.releaseDate.toString(),style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis)
+                    Text(pelicula.releaseDate.toString(),style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis)
                   ]),
                   Row(
                     children: <Widget>[
                       Icon(Icons.star_border),
-                      Text(pelicula.voteAverage.toString(),style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis)
+                      Text(pelicula.voteAverage.toString(),style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis)
                     ],
                   ),
                   Row(children: [
                     Icon(Icons.supervisor_account_outlined ),
-                    pelicula.adult?Text('+18',style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis):Text('+0',style: Theme.of(context).textTheme.subhead, overflow: TextOverflow.ellipsis),
+                    pelicula.adult?Text('+18',style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis):Text('+0',style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
                   ]),
                 ],
               )),
@@ -173,7 +179,7 @@ class PeliculaDetalle extends StatelessWidget {
         ),
       ),
       onTap: (){
-        Navigator.pushNamed(context, 'people',arguments: actor.id);
+        Navigator.pushNamed(context, 'people',arguments: actor);
       },
     );
   }

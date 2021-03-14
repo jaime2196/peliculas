@@ -26,6 +26,8 @@ dependencies:
   flutter_swiper: ^1.1.6
   http: ^0.12.0+4
   intl: ^0.16.1
+  provider: ^5.0.0
+  palette_generator: ^0.3.0
 
 dev_dependencies:
   flutter_test:

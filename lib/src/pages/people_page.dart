@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:peliculas/src/models/images_model.dart';
+import 'package:peliculas/src/models/actores_model.dart';
+
 import 'package:peliculas/src/models/peopleImage_model.dart';
-import 'package:peliculas/src/models/people_model.dart';
+
 import 'package:peliculas/src/providers/peliculas_provider.dart';
-import 'package:peliculas/src/widgets/header_painter.dart';
 import 'package:intl/intl.dart';
+import 'package:peliculas/src/widgets/GradientHelper.dart';
+import 'package:provider/provider.dart';
 
 
 class PeoplePage extends StatelessWidget {
@@ -12,43 +14,50 @@ class PeoplePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final peopleId= ModalRoute.of(context).settings.arguments;
+    final Actor actor= ModalRoute.of(context).settings.arguments;
     final peliculasProvider= PeliculasProvider();
+    
 
     return Scaffold(
-      body:  CustomPaint(
-        painter: HeaderPaintWaves(),
-        child: FutureBuilder(
-          future: peliculasProvider.getPeopleImage(peopleId),
-          builder: (BuildContext context, AsyncSnapshot<PeopleImage> snapshot) {
-            if(snapshot.hasData){
-              PeopleImage peopleImage=snapshot.data;
-              //return Text(peopleImage.people.name);
-              return _crearScrollView(peopleImage,context);
-            }else{
-              return Container(
-                height: double.infinity,
-                child: Center(
-                  child: CircularProgressIndicator()
-                )
-              );
-            }
+      body:   FutureBuilder(
+        future: peliculasProvider.getPeopleImage(actor.id),
+        builder: (BuildContext context, AsyncSnapshot<PeopleImage> snapshot) {
+          if(snapshot.hasData){
+            PeopleImage peopleImage=snapshot.data;
+            //return Text(peopleImage.people.name);
+            return _crearScrollView(peopleImage,context);
+          }else{
+            return _crearScrollViewLoading(actor,context);
           }
-        ),
+        }
       ),
     );
   }
 
   Widget _crearScrollView(PeopleImage peopleImage, BuildContext context){
+    final gradientHelper= Provider.of<GradientHelper>(context);
+    return Container(
+      decoration: BoxDecoration(
+          gradient: gradientHelper.gradient,
+        ),
+      child: CustomScrollView(
+        slivers: [
+          _crearAppbar(peopleImage),
+          SliverList(delegate: SliverChildListDelegate([
+            SizedBox(height: 10.0),
+            _datosBasicos(peopleImage,context),
+            peopleImage.people.biography==''?Container(): _descripcion(peopleImage),
+            _fotos(peopleImage),
+          ])),
+        ],
+      ),
+    );
+  }
+
+  Widget _crearScrollViewLoading(Actor actor, BuildContext context){
     return CustomScrollView(
       slivers: [
-        _crearAppbar(peopleImage),
-        SliverList(delegate: SliverChildListDelegate([
-          SizedBox(height: 10.0),
-          _datosBasicos(peopleImage,context),
-          peopleImage.people.biography==''?Container(): _descripcion(peopleImage),
-          _fotos(peopleImage),
-        ])),
+        _crearAppbarLoading(actor),
       ],
     );
   }
@@ -65,6 +74,26 @@ class PeoplePage extends StatelessWidget {
         background: FadeInImage(
           placeholder: AssetImage("assets/img/loading.gif"),
           image: NetworkImage(peopleImage.imagesModel.getURLImagen(0)),
+          fadeInDuration: Duration(milliseconds: 15),
+          fit: BoxFit.cover,
+        ),
+      ),
+      
+    );
+  }
+
+  _crearAppbarLoading(Actor actor){
+    return SliverAppBar(
+      elevation: 2.0,
+      backgroundColor: Colors.indigoAccent,
+      expandedHeight: 600.0,
+      floating: false,
+      pinned: true,
+      flexibleSpace: FlexibleSpaceBar(
+        title: Text(actor.name, style: TextStyle(color:Colors.white,fontSize: 16)),
+        background: FadeInImage(
+          placeholder: AssetImage("assets/img/loading.gif"),
+          image: AssetImage("assets/img/loading.gif"),
           fadeInDuration: Duration(milliseconds: 15),
           fit: BoxFit.cover,
         ),
@@ -108,27 +137,6 @@ class PeoplePage extends StatelessWidget {
               rowDatoBasico(Icons.place,lugarNacimiento,context),
               rowDatoBasico(Icons.star_border,'Popularidad: ${peopleImage.people.popularity.truncate().toString()}',context),
               rowDatoBasico(Icons.people,sexo,context),
-              /*Row(children: [
-                Icon(Icons.face),
-                Text(fechaNacimiento,style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
-              ]),
-              Row(children: [
-                Icon(Icons.person),
-                Text(edad,style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
-              ]),
-              Row(
-                children: [
-                Icon(Icons.place),
-                Text(lugarNacimiento,style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
-              ]),
-              Row(children: [
-                Icon(Icons.star_border),
-                Text('Popularidad: ${peopleImage.people.popularity.truncate().toString()}',style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
-              ]),
-              Row(children: [
-                Icon(Icons.people),
-                Text(sexo,style: Theme.of(context).textTheme.subtitle1, overflow: TextOverflow.ellipsis),
-              ]),*/
             ],
           ),
         ),
@@ -186,18 +194,22 @@ class PeoplePage extends StatelessWidget {
   }
 
   Widget _fotos(PeopleImage peopleImage){
-    List<Image> lista=new List();
-    for(int i=1;i!=peopleImage.imagesModel.profiles.length;i++){
-      lista.add(Image.network(peopleImage.imagesModel.getURLImagen(i)));
+    List<Widget> listaWidget=[];
+    if(peopleImage.imagesModel.profiles.length>1){
+      List<Image> lista=[];
+      for(int i=1;i!=peopleImage.imagesModel.profiles.length;i++){
+        lista.add(Image.network(peopleImage.imagesModel.getURLImagen(i)));
+      }
+      
+      for(int a=1;a!=lista.length;a++){
+        FadeInImage fadeInImage=FadeInImage.assetNetwork(
+          image: peopleImage.imagesModel.getURLImagen(a),
+          placeholder: "assets/img/loading.gif",
+        );
+        listaWidget.add(_foto(fadeInImage));
+      }
     }
-    List<Widget> listaWidget=new List();
-    for(int a=0;a!=lista.length;a++){
-      FadeInImage fadeInImage=FadeInImage.assetNetwork(
-        image: peopleImage.imagesModel.getURLImagen(a),
-        placeholder: "assets/img/loading.gif",
-      );
-      listaWidget.add(_foto(fadeInImage));
-    }
+    
     return Column(
       children: listaWidget,
     );
