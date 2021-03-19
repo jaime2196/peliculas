@@ -10,14 +10,24 @@ class GradientHelper with ChangeNotifier{
       colors: [Colors.blue, Colors.red]
   );
 
-
-  get gradient =>  _linearGradient;
-
-
-  set gradient(LinearGradient gradient){
+   get gradient =>  _linearGradient;
+   
+   set gradient(LinearGradient gradient){
     _linearGradient=gradient;
     notifyListeners();
   }
+
+  Color _color= Color(0xFF4E8CBF);
+
+  set color(Color color){
+    _color=color;
+    notifyListeners();
+  }
+
+  get color => _color;
+
+
+  
 
   generarColor(String hola)async{
     PaletteGenerator generator = await PaletteGenerator.fromImageProvider(
@@ -25,7 +35,7 @@ class GradientHelper with ChangeNotifier{
       //size: Size(200,100),
     );
     //PaletteColor color= generator.dominantColor;
-
+    _color=generator.dominantColor.color;
     LinearGradient gradiente = LinearGradient(
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
